@@ -100,6 +100,44 @@ describe('RealtimeSession', () => {
     warnSpy.mockRestore();
   });
 
+  it('connects successfully with an MCP server when tracing is disabled (Issue 580 regression test)', async () => {
+    // 1. Setup a dummy MCP SDK endpoint
+    const http = await import('http');
+    const dummyServer = http.createServer((req: any, res: any) => {
+      res.writeHead(200);
+      res.end('{}');
+    });
+    dummyServer.listen(0); // arbitrary port
+    const port = (dummyServer.address() as any).port;
+
+    try {
+      const { MCPServerStreamableHttp } = await import('@openai/agents-core');
+      const mcpServer = new MCPServerStreamableHttp({
+        url: `http://localhost:${port}/mcp`,
+        name: 'test-mcp-server-580',
+      });
+      // Override connect to not actually fetch/fail if our dummy isn't fully MCP compliant
+      mcpServer.connect = async () => {};
+      mcpServer.listTools = async () => [];
+
+      const agent = new RealtimeAgent({
+        name: 'A',
+        handoffs: [],
+        mcpServers: [mcpServer],
+      });
+
+      const s = new RealtimeSession(agent, {
+        transport: new FakeTransport(),
+        tracingDisabled: true, // This is the key condition for the fix in #685 / #580
+      });
+
+      // 2. session.connect() should not throw "No existing trace found"
+      await expect(s.connect({ apiKey: 'test' })).resolves.not.toThrow();
+    } finally {
+      dummyServer.close();
+    }
+  });
+
   it('updates history and emits history_updated', () => {
     const historyEvents: RealtimeItem[][] = [];
     session.on('history_updated', (h) => {
