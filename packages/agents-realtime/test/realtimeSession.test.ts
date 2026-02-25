@@ -61,7 +61,7 @@ describe('RealtimeSession', () => {
   });
 
   it('sets the trace config correctly', async () => {
-    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => { });
     transport.connectCalls = [];
     session.options.tracingDisabled = true;
     session.options.workflowName = 'test';
@@ -117,7 +117,7 @@ describe('RealtimeSession', () => {
         name: 'test-mcp-server-580',
       });
       // Override connect to not actually fetch/fail if our dummy isn't fully MCP compliant
-      mcpServer.connect = async () => {};
+      mcpServer.connect = async () => { };
       mcpServer.listTools = async () => [];
 
       const agent = new RealtimeAgent({
@@ -132,7 +132,7 @@ describe('RealtimeSession', () => {
       });
 
       // 2. session.connect() should not throw "No existing trace found"
-      await expect(s.connect({ apiKey: 'test' })).resolves.not.toThrow();
+      await expect(s.connect({ apiKey: 'test' })).resolves.toBeUndefined();
     } finally {
       dummyServer.close();
     }
@@ -189,7 +189,7 @@ describe('RealtimeSession', () => {
     expect(customSession.transport).toBe(customTransport);
 
     const originalPeerConnection = (global as any).RTCPeerConnection;
-    (global as any).RTCPeerConnection = function () {};
+    (global as any).RTCPeerConnection = function () { };
     try {
       const webrtcSession = new RealtimeSession(agent, {
         transport: 'webrtc',
@@ -519,7 +519,7 @@ describe('RealtimeSession', () => {
   });
 
   it('propagates errors from handleFunctionCall', async () => {
-    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => { });
     const errors: any[] = [];
     session.on('error', (e) => errors.push(e));
     transport.emit('function_call', {
@@ -578,7 +578,7 @@ describe('RealtimeSession', () => {
   });
 
   it('emits an error when timeoutBehavior is raise_exception', async () => {
-    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => { });
     const localTransport = new FakeTransport();
     const timedTool = tool({
       name: 'timed_tool',
@@ -663,7 +663,7 @@ describe('RealtimeSession', () => {
   });
 
   it('emits error when input tool guardrail throws', async () => {
-    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => { });
     const localTransport = new FakeTransport();
     const guardrail = defineToolInputGuardrail({
       name: 'thrower',
@@ -751,7 +751,7 @@ describe('RealtimeSession', () => {
   });
 
   it('emits error when output tool guardrail throws', async () => {
-    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => { });
     const localTransport = new FakeTransport();
     const guardrail = defineToolOutputGuardrail({
       name: 'thrower_out',
@@ -968,7 +968,7 @@ describe('RealtimeSession', () => {
   });
 
   it('falls back to default rejection response when toolErrorFormatter throws', async () => {
-    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => { });
     const needsApprovalTool = tool({
       name: 'needs_approval',
       description: 'Needs approval tool',
@@ -1062,7 +1062,7 @@ describe('RealtimeSession', () => {
     const t = new FakeTransport();
     const s = new RealtimeSession(agent, { transport: t });
     await s.connect({ apiKey: 'test' });
-    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => { });
 
     const approvalItem = new RunToolApprovalItem(
       {
@@ -1101,7 +1101,7 @@ describe('RealtimeSession', () => {
     const t = new FakeTransport();
     const s = new RealtimeSession(agent, { transport: t });
     await s.connect({ apiKey: 'test' });
-    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => { });
 
     const approvalItem = new RunToolApprovalItem(
       {
@@ -1227,7 +1227,7 @@ describe('RealtimeSession', () => {
     class TestTransport extends OpenAIRealtimeBase {
       status: 'connected' | 'disconnected' | 'connecting' | 'disconnecting' =
         'connected';
-      connect = vi.fn(async () => {});
+      connect = vi.fn(async () => { });
       sendEvent = vi.fn();
       mute = vi.fn();
       close = vi.fn();
@@ -1271,7 +1271,7 @@ describe('RealtimeSession', () => {
     class TestTransport extends OpenAIRealtimeBase {
       status: 'connected' | 'disconnected' | 'connecting' | 'disconnecting' =
         'connected';
-      connect = vi.fn(async () => {});
+      connect = vi.fn(async () => { });
       sendEvent = vi.fn();
       mute = vi.fn();
       close = vi.fn();
